@@ -57,16 +57,17 @@ func Exec() {
 			fmt.Println("Failed to decode JSON: \n", err.Error())
 			return
 		}
+		
+		estimate := internal.NewGenerator(estimateJson.Title, estimateJson.Customer)
+		if estimateJson.CurrencyFormat != nil {
+			estimate.CurrencyFormat = *estimateJson.CurrencyFormat
+		}
+
+		estimate.AddItems(estimateJson.Items)
 
 		builder := ""
 		if *discord {
 			builder += "```\n"
-		}
-
-		estimate := internal.NewGenerator(estimateJson.Title, estimateJson.Customer)
-
-		for _, item := range estimateJson.Items {
-			estimate.AddItem(item.Description, item.Price)
 		}
 
 		builder += estimate.StringEstimate()

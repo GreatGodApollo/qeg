@@ -37,9 +37,10 @@ func (r *EstimateJSON) Marshal() ([]byte, error) {
 }
 
 type EstimateJSON struct {
-	Title    string `json:"title"`
-	Customer string `json:"customer"`
-	Items    []Item `json:"items"`
+	Title          string  `json:"title"`
+	Customer       string  `json:"customer"`
+	Items          []Item  `json:"items"`
+	CurrencyFormat *string `json:"currency,omitempty"`
 }
 
 type Item struct {

@@ -31,16 +31,18 @@ import (
 )
 
 type EstimateGenerator struct {
-	Title    string
-	Customer string
-	Items    []Item
-	Sizes    []int
+	Title          string
+	Customer       string
+	CurrencyFormat string
+	Items          []Item
+	Sizes          []int
 }
 
 func NewGenerator(title, customer string) *EstimateGenerator {
 	return &EstimateGenerator{
 		Title:    title,
 		Customer: customer,
+		CurrencyFormat: "$%.2f",
 		Items:    make([]Item, 0),
 		Sizes:    make([]int, 3),
 	}
@@ -48,12 +50,19 @@ func NewGenerator(title, customer string) *EstimateGenerator {
 
 func (eg *EstimateGenerator) AddItem(description string, price float64) *EstimateGenerator {
 	eg.Items = append(eg.Items, Item{Description: description, Price: price})
-	eg.calculateSizes()
+	eg.CalculateSizes()
 
 	return eg
 }
 
-func (eg *EstimateGenerator) calculateSizes() {
+func (eg *EstimateGenerator) AddItems(items []Item) *EstimateGenerator {
+	eg.Items = append(eg.Items, items...)
+	eg.CalculateSizes()
+	
+	return eg
+}
+
+func (eg *EstimateGenerator) CalculateSizes() {
 	itemSize := 0
 	priceSize := 0
 
@@ -65,7 +74,7 @@ func (eg *EstimateGenerator) calculateSizes() {
 
 	for _, k := range eg.Items {
 		iLen := runewidth.StringWidth(k.Description)
-		pLen := runewidth.StringWidth(fmt.Sprintf("$%.2f", k.Price))
+		pLen := runewidth.StringWidth(fmt.Sprintf(eg.CurrencyFormat, k.Price))
 
 		if iLen > itemSize {
 			itemSize = iLen
@@ -104,7 +113,7 @@ func (eg *EstimateGenerator) StringEstimate() string {
 		builder += item.Description
 		builder += "  | "
 
-		price := fmt.Sprintf("$%.2f", item.Price)
+		price := fmt.Sprintf(eg.CurrencyFormat, item.Price)
 		spacesLeft = eg.Sizes[1] - runewidth.StringWidth(price)
 		builder += strings.Repeat(" ", spacesLeft)
 		builder += price + "\n"
@@ -114,7 +123,7 @@ func (eg *EstimateGenerator) StringEstimate() string {
 
 	builder += eg.dash() + "\n"
 
-	totalLine := fmt.Sprintf("Total: $%.2f", total)
+	totalLine := fmt.Sprintf("Total: " + eg.CurrencyFormat, total)
 	spacesLeft := eg.Sizes[2] - runewidth.StringWidth(totalLine)
 	builder += strings.Repeat(" ", spacesLeft) + totalLine
 
