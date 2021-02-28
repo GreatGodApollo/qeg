@@ -38,6 +38,7 @@ func Exec() {
 	app := cli.App("qeg", "Quick Estimate Generator")
 
 	app.Spec = "[-c] [-d] FILE"
+	app.Version("v version", "qeg v0.2.0")
 
 	var (
 		copy     = app.BoolOpt("c copy", false, "Copy to clipboard?")
